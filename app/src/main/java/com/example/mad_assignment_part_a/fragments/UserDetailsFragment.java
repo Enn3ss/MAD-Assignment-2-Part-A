@@ -90,14 +90,12 @@ public class UserDetailsFragment extends Fragment
         TextView usernameTextView = (TextView) view.findViewById(R.id.usernameTextView);
         TextView phoneTextView = (TextView) view.findViewById(R.id.phoneTextView);
         TextView emailTextView = (TextView) view.findViewById(R.id.emailTextView);
-        TextView addressTextView = (TextView) view.findViewById(R.id.addressTextView);
         TextView streetTextView = (TextView) view.findViewById(R.id.streetTextView);
         TextView suiteTextView = (TextView) view.findViewById(R.id.suiteTextView);
         TextView cityTextView = (TextView) view.findViewById(R.id.cityTextView);
         TextView zipcodeTextView = (TextView) view.findViewById(R.id.zipcodeTextView);
         TextView geoTextView = (TextView) view.findViewById(R.id.geoTextView);
         TextView websiteTextView = (TextView) view.findViewById(R.id.websiteTextView);
-        TextView companyTextView = (TextView) view.findViewById(R.id.companyTextView);
         TextView companyNameTextView = (TextView) view.findViewById(R.id.companyNameTextView);
         TextView catchPhraseTextView = (TextView) view.findViewById(R.id.catchPhraseTextView);
         TextView bsTextView = (TextView) view.findViewById(R.id.bsTextView);
@@ -124,7 +122,7 @@ public class UserDetailsFragment extends Fragment
             public void onClick(View view)
             {
                 FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
-                RecyclerFragment recyclerFragment = new RecyclerFragment(users);
+                UsersRecyclerFragment recyclerFragment = new UsersRecyclerFragment(users);
                 fm.beginTransaction().replace(R.id.fragment_container, recyclerFragment).commit();
             }
         });

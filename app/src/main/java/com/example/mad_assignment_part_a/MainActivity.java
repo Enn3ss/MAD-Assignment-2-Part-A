@@ -13,7 +13,7 @@ import com.example.mad_assignment_part_a.data.Address;
 import com.example.mad_assignment_part_a.data.Company;
 import com.example.mad_assignment_part_a.data.Geo;
 import com.example.mad_assignment_part_a.data.UserData;
-import com.example.mad_assignment_part_a.fragments.RecyclerFragment;
+import com.example.mad_assignment_part_a.fragments.UsersRecyclerFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -301,11 +301,11 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(MainActivity.this, "Users Loaded", Toast.LENGTH_LONG).show();
 
                     FragmentManager fm = getSupportFragmentManager();
-                    RecyclerFragment recyclerFragment = (RecyclerFragment) fm.findFragmentById(R.id.fragment_container);
+                    UsersRecyclerFragment recyclerFragment = (UsersRecyclerFragment) fm.findFragmentById(R.id.fragment_container);
 
                     if(recyclerFragment == null)
                     {
-                        recyclerFragment = new RecyclerFragment(users);
+                        recyclerFragment = new UsersRecyclerFragment(users);
                         fm.beginTransaction().add(R.id.fragment_container, recyclerFragment).commit();
                     }
                 }
@@ -315,20 +315,5 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        FragmentManager fm = getSupportFragmentManager();
-
-        if(fm.getBackStackEntryCount() > 0)
-        {
-            fm.popBackStack();
-        }
-        else
-        {
-            super.onBackPressed();
-        }
     }
 }

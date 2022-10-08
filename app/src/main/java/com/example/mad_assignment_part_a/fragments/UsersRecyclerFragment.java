@@ -22,10 +22,10 @@ import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link RecyclerFragment#newInstance} factory method to
+ * Use the {@link UsersRecyclerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RecyclerFragment extends Fragment
+public class UsersRecyclerFragment extends Fragment
 {
     private List<UserData> users;
 
@@ -38,12 +38,12 @@ public class RecyclerFragment extends Fragment
     private String mParam1;
     private String mParam2;
 
-    public RecyclerFragment()
+    public UsersRecyclerFragment()
     {
         // Required empty public constructor
     }
 
-    public RecyclerFragment(List<UserData> users)
+    public UsersRecyclerFragment(List<UserData> users)
     {
         this.users = users;
     }
@@ -57,9 +57,9 @@ public class RecyclerFragment extends Fragment
      * @return A new instance of fragment RecyclerFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static RecyclerFragment newInstance(String param1, String param2)
+    public static UsersRecyclerFragment newInstance(String param1, String param2)
     {
-        RecyclerFragment fragment = new RecyclerFragment();
+        UsersRecyclerFragment fragment = new UsersRecyclerFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -82,32 +82,32 @@ public class RecyclerFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_recycler, container, false);
+        View view = inflater.inflate(R.layout.fragment_users_recycler, container, false);
         RecyclerView rv = view.findViewById(R.id.recView);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        UserAdapter adapter = new UserAdapter(users, getContext());
+        Adapter adapter = new Adapter(users, getContext());
         rv.setAdapter(adapter);
 
         return view;
     }
 
-    private class UserViewHolder extends RecyclerView.ViewHolder // ViewHolder inner class
+    private class ViewHolder extends RecyclerView.ViewHolder // ViewHolder inner class
     {
         public TextView usernameTextView;
 
-        public UserViewHolder(@NonNull View itemView)
+        public ViewHolder(@NonNull View itemView)
         {
             super(itemView);
             usernameTextView = itemView.findViewById(R.id.username);
         }
     }
 
-    private class UserAdapter extends RecyclerView.Adapter<UserViewHolder> // Adapter inner class
+    private class Adapter extends RecyclerView.Adapter<ViewHolder> // Adapter inner class
     {
         List<UserData> data;
         Context context;
 
-        public UserAdapter(List<UserData> data, Context context)
+        public Adapter(List<UserData> data, Context context)
         {
             this.data = data;
             this.context = context;
@@ -115,17 +115,17 @@ public class RecyclerFragment extends Fragment
 
         @NonNull
         @Override
-        public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
         {
             LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
             View view = layoutInflater.inflate(R.layout.each_username_view, parent, false);
-            UserViewHolder userViewHolder = new UserViewHolder(view);
+            ViewHolder userViewHolder = new ViewHolder(view);
 
             return userViewHolder;
         }
 
         @Override
-        public void onBindViewHolder(@NonNull UserViewHolder holder, int position)
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position)
         {
             UserData user = data.get(position);
             holder.usernameTextView.setText(user.getUsername());
