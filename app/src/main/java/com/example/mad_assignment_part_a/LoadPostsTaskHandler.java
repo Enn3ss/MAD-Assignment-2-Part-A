@@ -5,22 +5,25 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.mad_assignment_part_a.view_models.PostsViewModel;
+import com.example.mad_assignment_part_a.view_models.UsersViewModel;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class BackgroundTaskHandler implements Runnable
+public class LoadPostsTaskHandler implements Runnable
 {
     private Activity uiActivity;
-    private UsersViewModel usersViewModel;
+    private PostsViewModel postsViewModel;
     private ProgressBar progressBar;
 
 
-    public BackgroundTaskHandler(Activity uiActivity, UsersViewModel usersViewModel, ProgressBar progressBar)
+    public LoadPostsTaskHandler(Activity uiActivity, PostsViewModel postsViewModel, ProgressBar progressBar)
     {
         this.uiActivity = uiActivity;
-        this.usersViewModel = usersViewModel;
+        this.postsViewModel = postsViewModel;
         this.progressBar = progressBar;
     }
 
@@ -28,30 +31,30 @@ public class BackgroundTaskHandler implements Runnable
     public void run()
     {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        LoadUsersTask loadUsersTask = new LoadUsersTask(uiActivity);
-        Future<String> loadUsersPlaceholder = executorService.submit(loadUsersTask);
-        String loadUsersResult = waitingForSearch(loadUsersPlaceholder);
+        LoadPostsTask loadPostsTask = new LoadPostsTask(uiActivity);
+        Future<String> loadPostsPlaceholder = executorService.submit(loadPostsTask);
+        String loadPostsResult = waitingForPosts(loadPostsPlaceholder);
 
-        if(loadUsersResult != null)
+        if(loadPostsResult != null)
         {
             uiActivity.runOnUiThread(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    usersViewModel.setUsersData(loadUsersResult);
+                    postsViewModel.setPostsData(loadPostsResult);
                 }
             });
         }
         else
         {
-            showError(4, "Load Users");
+            showError(4, "Load Posts");
         }
 
         executorService.shutdown();
     }
 
-    public String waitingForSearch(Future<String> loadUsersPlaceholder)
+    public String waitingForPosts(Future<String> loadPostsPlaceholder)
     {
         uiActivity.runOnUiThread(new Runnable()
         {
@@ -62,31 +65,31 @@ public class BackgroundTaskHandler implements Runnable
             }
         });
 
-        showToast("Search Starts");
-        String loadUsersData = null;
+        showToast("Loading Posts Start");
+        String loadPostsData = null;
 
         try
         {
-            //loadUsersData = loadUsersPlaceholder.get(6000, TimeUnit.MILLISECONDS);
-            loadUsersData = loadUsersPlaceholder.get();
+            //loadPostsData = loadPostsPlaceholder.get(6000, TimeUnit.MILLISECONDS);
+            loadPostsData = loadPostsPlaceholder.get();
         }
         catch(ExecutionException e)
         {
             e.printStackTrace();
-            showError(1, "Search");
+            showError(1, "Load Posts");
         }
         catch(InterruptedException e)
         {
             e.printStackTrace();
-            showError(2, "Search");
+            showError(2, "Load Posts");
         }
         /*catch(TimeoutException e)
         {
             e.printStackTrace();
-            showError(3, "Search");
+            showError(3, "Load Posts");
         }*/
 
-        showToast("Search Ends");
+        showToast("Loading Posts Finished");
 
         uiActivity.runOnUiThread(new Runnable()
         {
@@ -97,7 +100,7 @@ public class BackgroundTaskHandler implements Runnable
             }
         });
 
-        return loadUsersData;
+        return loadPostsData;
     }
 
     public void showToast(String message)

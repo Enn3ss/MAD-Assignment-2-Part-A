@@ -1,4 +1,4 @@
-package com.example.mad_assignment_part_a;
+package com.example.mad_assignment_part_a.view_models;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;

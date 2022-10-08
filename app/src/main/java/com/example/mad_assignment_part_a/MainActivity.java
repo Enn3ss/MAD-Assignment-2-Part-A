@@ -12,8 +12,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.mad_assignment_part_a.data.Address;
 import com.example.mad_assignment_part_a.data.Company;
 import com.example.mad_assignment_part_a.data.Geo;
+import com.example.mad_assignment_part_a.data.PostData;
 import com.example.mad_assignment_part_a.data.UserData;
 import com.example.mad_assignment_part_a.fragments.UsersRecyclerFragment;
+import com.example.mad_assignment_part_a.view_models.PostsViewModel;
+import com.example.mad_assignment_part_a.view_models.UsersViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +30,9 @@ import java.util.concurrent.Executors;
 public class MainActivity extends AppCompatActivity
 {
     private UsersViewModel usersViewModel;
+    private PostsViewModel postsViewModel;
+    private List<UserData> users;
+    private List<PostData> posts;
     private ProgressBar progressBar;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -37,9 +43,10 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         usersViewModel = new ViewModelProvider(this, (ViewModelProvider.Factory) new ViewModelProvider.NewInstanceFactory()).get(UsersViewModel.class);
+        postsViewModel = new ViewModelProvider(this, (ViewModelProvider.Factory) new ViewModelProvider.NewInstanceFactory()).get(PostsViewModel.class);
         progressBar = findViewById(R.id.progressBar);
 
-        //BackgroundTaskHandler backgroundTaskHandler = new BackgroundTaskHandler(MainActivity.this, usersViewModel, progressBar);
+        //BackgroundTaskHandler backgroundTaskHandler = new BackgroundTaskHandler(MainActivity.this, usersViewModel, postsViewModel, progressBar);
         //executorService.execute(backgroundTaskHandler);
 
         String test = "[\n" +
@@ -277,6 +284,66 @@ public class MainActivity extends AppCompatActivity
 
         usersViewModel.setUsersData(test);
 
+        String test2 = "[\n" +
+                "  {\n" +
+                "    \"userId\": 1,\n" +
+                "    \"id\": 1,\n" +
+                "    \"title\": \"sunt aut facere repellat provident occaecati excepturi optio reprehenderit\",\n" +
+                "    \"body\": \"quia et suscipit\\nsuscipit recusandae consequuntur expedita et cum\\nreprehenderit molestiae ut ut quas totam\\nnostrum rerum est autem sunt rem eveniet architecto\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"userId\": 1,\n" +
+                "    \"id\": 2,\n" +
+                "    \"title\": \"qui est esse\",\n" +
+                "    \"body\": \"est rerum tempore vitae\\nsequi sint nihil reprehenderit dolor beatae ea dolores neque\\nfugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\\nqui aperiam non debitis possimus qui neque nisi nulla\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"userId\": 1,\n" +
+                "    \"id\": 3,\n" +
+                "    \"title\": \"ea molestias quasi exercitationem repellat qui ipsa sit aut\",\n" +
+                "    \"body\": \"et iusto sed quo iure\\nvoluptatem occaecati omnis eligendi aut ad\\nvoluptatem doloribus vel accusantium quis pariatur\\nmolestiae porro eius odio et labore et velit aut\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"userId\": 1,\n" +
+                "    \"id\": 4,\n" +
+                "    \"title\": \"eum et est occaecati\",\n" +
+                "    \"body\": \"ullam et saepe reiciendis voluptatem adipisci\\nsit amet autem assumenda provident rerum culpa\\nquis hic commodi nesciunt rem tenetur doloremque ipsam iure\\nquis sunt voluptatem rerum illo velit\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"userId\": 1,\n" +
+                "    \"id\": 5,\n" +
+                "    \"title\": \"nesciunt quas odio\",\n" +
+                "    \"body\": \"repudiandae veniam quaerat sunt sed\\nalias aut fugiat sit autem sed est\\nvoluptatem omnis possimus esse voluptatibus quis\\nest aut tenetur dolor neque\"\n" +
+                "  }\n" +
+                "]";
+
+        //postsViewModel.setPostsData(test2);
+/*
+        postsViewModel.postsData.observe(MainActivity.this, new Observer<String>()
+        {
+            @Override
+            public void onChanged(String s)
+            {
+                try
+                {
+                    String postsData = postsViewModel.getPostsData();
+                    JSONArray jList = new JSONArray(postsData);
+                    posts = new ArrayList<>();
+
+                    for(int i = 0; i < jList.length(); i++)
+                    {
+                        JSONObject jObject = jList.getJSONObject(i);
+                        PostData post = new PostData(jObject.getInt("userId"), jObject.getInt("id"), jObject.getString("title"), jObject.getString("body"));
+                        posts.add(post);
+                    }
+                }
+                catch(JSONException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });*/
+
         usersViewModel.usersData.observe(this, new Observer<String>()
         {
             @Override
@@ -286,7 +353,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     String userData = usersViewModel.getUsersData();
                     JSONArray jList = new JSONArray(userData);
-                    List<UserData> users = new ArrayList<>();
+                    users = new ArrayList<>();
 
                     for (int i = 0; i < jList.length(); i++)
                     {
@@ -298,7 +365,7 @@ public class MainActivity extends AppCompatActivity
                         users.add(user);
                     }
 
-                    Toast.makeText(MainActivity.this, "Users Loaded", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(MainActivity.this, "Users Loaded", Toast.LENGTH_LONG).show();
 
                     FragmentManager fm = getSupportFragmentManager();
                     UsersRecyclerFragment recyclerFragment = (UsersRecyclerFragment) fm.findFragmentById(R.id.fragment_container);

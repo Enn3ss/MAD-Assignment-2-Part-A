@@ -14,8 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.mad_assignment_part_a.MainActivity;
 import com.example.mad_assignment_part_a.R;
+import com.example.mad_assignment_part_a.data.PostData;
 import com.example.mad_assignment_part_a.data.UserData;
 
 import java.util.List;
@@ -82,12 +85,13 @@ public class UsersRecyclerFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+
         View view = inflater.inflate(R.layout.fragment_users_recycler, container, false);
-        RecyclerView rv = view.findViewById(R.id.recView);
+        RecyclerView rv = view.findViewById(R.id.usersRecyclerView);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         Adapter adapter = new Adapter(users, getContext());
         rv.setAdapter(adapter);
-
+        Toast.makeText(getContext(), "TESTING", Toast.LENGTH_LONG).show();
         return view;
     }
 

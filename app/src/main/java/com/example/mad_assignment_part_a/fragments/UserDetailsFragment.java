@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.mad_assignment_part_a.R;
+import com.example.mad_assignment_part_a.data.PostData;
 import com.example.mad_assignment_part_a.data.UserData;
 
 import java.util.List;
@@ -115,6 +116,17 @@ public class UserDetailsFragment extends Fragment
         companyNameTextView.setText("Company Name: " + user.getCompany().getName());
         catchPhraseTextView.setText("Catch Phrase: " + user.getCompany().getCatchPhrase());
         bsTextView.setText("BS: " + user.getCompany().getBs());
+
+        viewPostButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
+                PostsRecyclerFragment recyclerFragment = new PostsRecyclerFragment(users, user, context);
+                fm.beginTransaction().replace(R.id.fragment_container, recyclerFragment).commit();
+            }
+        });
 
         backButton.setOnClickListener(new View.OnClickListener()
         {
