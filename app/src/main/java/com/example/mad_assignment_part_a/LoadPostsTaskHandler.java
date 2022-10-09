@@ -6,18 +6,19 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.mad_assignment_part_a.view_models.PostsViewModel;
-import com.example.mad_assignment_part_a.view_models.UsersViewModel;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class LoadPostsTaskHandler implements Runnable
 {
-    private Activity uiActivity;
-    private PostsViewModel postsViewModel;
-    private ProgressBar progressBar;
+    private final Activity uiActivity;
+    private final PostsViewModel postsViewModel;
+    private final ProgressBar progressBar;
 
 
     public LoadPostsTaskHandler(Activity uiActivity, PostsViewModel postsViewModel, ProgressBar progressBar)
@@ -70,8 +71,8 @@ public class LoadPostsTaskHandler implements Runnable
 
         try
         {
-            //loadPostsData = loadPostsPlaceholder.get(6000, TimeUnit.MILLISECONDS);
-            loadPostsData = loadPostsPlaceholder.get();
+            loadPostsData = loadPostsPlaceholder.get(6000, TimeUnit.MILLISECONDS);
+            //loadPostsData = loadPostsPlaceholder.get();
         }
         catch(ExecutionException e)
         {
@@ -83,11 +84,11 @@ public class LoadPostsTaskHandler implements Runnable
             e.printStackTrace();
             showError(2, "Load Posts");
         }
-        /*catch(TimeoutException e)
+        catch(TimeoutException e)
         {
             e.printStackTrace();
             showError(3, "Load Posts");
-        }*/
+        }
 
         showToast("Loading Posts Finished");
 
@@ -119,19 +120,19 @@ public class LoadPostsTaskHandler implements Runnable
     {
         if(code == 1)
         {
-            showToast(taskName + " Task Execution Exception");
+            showToast(taskName + ": Task Execution Exception");
         }
         else if(code == 2)
         {
-            showToast(taskName + " Task Interrupted Exception");
+            showToast(taskName + ": Task Interrupted Exception");
         }
         else if(code == 3)
         {
-            showToast(taskName + " Task Timeout Exception");
+            showToast(taskName + ": Task Timeout Exception");
         }
         else
         {
-            showToast(taskName + " Task could not be performed. Restart!!");
+            showToast(taskName + ": Task could not be performed. Try again!");
         }
     }
 }

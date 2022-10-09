@@ -1,32 +1,24 @@
 package com.example.mad_assignment_part_a.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mad_assignment_part_a.R;
 import com.example.mad_assignment_part_a.data.PostData;
 import com.example.mad_assignment_part_a.data.UserData;
-import com.example.mad_assignment_part_a.view_models.PostsViewModel;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +30,7 @@ import java.util.List;
  */
 public class PostsRecyclerFragment extends Fragment
 {
+    private Activity uiActivity;
     private List<PostData> posts;
     private List<UserData> users;
     private UserData user;
@@ -57,9 +50,11 @@ public class PostsRecyclerFragment extends Fragment
         // Required empty public constructor
     }
 
-    public PostsRecyclerFragment(List<UserData> users, UserData user, Context context)
+    public PostsRecyclerFragment(Activity uiActivity, List<UserData> users, List<PostData> posts, UserData user, Context context)
     {
+        this.uiActivity = uiActivity;
         this.users = users;
+        this.posts = posts;
         this.user = user;
         this.context = context;
     }
@@ -100,64 +95,24 @@ public class PostsRecyclerFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_posts_recycler, container, false);
 
-        String test2 = "[\n" +
-                "  {\n" +
-                "    \"userId\": 1,\n" +
-                "    \"id\": 1,\n" +
-                "    \"title\": \"sunt aut facere repellat provident occaecati excepturi optio reprehenderit\",\n" +
-                "    \"body\": \"quia et suscipit\\nsuscipit recusandae consequuntur expedita et cum\\nreprehenderit molestiae ut ut quas totam\\nnostrum rerum est autem sunt rem eveniet architecto\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"userId\": 1,\n" +
-                "    \"id\": 2,\n" +
-                "    \"title\": \"qui est esse\",\n" +
-                "    \"body\": \"est rerum tempore vitae\\nsequi sint nihil reprehenderit dolor beatae ea dolores neque\\nfugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\\nqui aperiam non debitis possimus qui neque nisi nulla\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"userId\": 1,\n" +
-                "    \"id\": 3,\n" +
-                "    \"title\": \"ea molestias quasi exercitationem repellat qui ipsa sit aut\",\n" +
-                "    \"body\": \"et iusto sed quo iure\\nvoluptatem occaecati omnis eligendi aut ad\\nvoluptatem doloribus vel accusantium quis pariatur\\nmolestiae porro eius odio et labore et velit aut\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"userId\": 1,\n" +
-                "    \"id\": 4,\n" +
-                "    \"title\": \"eum et est occaecati\",\n" +
-                "    \"body\": \"ullam et saepe reiciendis voluptatem adipisci\\nsit amet autem assumenda provident rerum culpa\\nquis hic commodi nesciunt rem tenetur doloremque ipsam iure\\nquis sunt voluptatem rerum illo velit\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"userId\": 1,\n" +
-                "    \"id\": 5,\n" +
-                "    \"title\": \"nesciunt quas odio\",\n" +
-                "    \"body\": \"repudiandae veniam quaerat sunt sed\\nalias aut fugiat sit autem sed est\\nvoluptatem omnis possimus esse voluptatibus quis\\nest aut tenetur dolor neque\"\n" +
-                "  }\n" +
-                "]";
-        try
-        {
-            String postsData = test2;
-            JSONArray jList = new JSONArray(postsData);
-            posts = new ArrayList<>();
-
-            for(int i = 0; i < jList.length(); i++)
-            {
-                JSONObject jObject = jList.getJSONObject(i);
-                PostData post = new PostData(jObject.getInt("userId"), jObject.getInt("id"), jObject.getString("title"), jObject.getString("body"));
-                posts.add(post);
-            }
-        }
-        catch(JSONException e)
-        {
-            e.printStackTrace();
-        }
-
+        // Setting up fragment GUI
         Button backButton = (Button) view.findViewById(R.id.postBackButton);
         RecyclerView rv = view.findViewById(R.id.postsRecyclerView);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        Adapter adapter = new Adapter(posts);
+
+        // Getting posts made by current user
+        List<PostData> userPosts = new ArrayList<>();
+
+        for(PostData post : posts)
+        {
+            if(post.getUserId() == user.getId())
+            {
+                userPosts.add(post);
+            }
+        }
+
+        Adapter adapter = new Adapter(userPosts);
         rv.setAdapter(adapter);
-
-
-        //Toast.makeText(getContext(), posts.get(0).getTitle(), Toast.LENGTH_SHORT).show();
 
         backButton.setOnClickListener(new View.OnClickListener()
         {
@@ -165,7 +120,7 @@ public class PostsRecyclerFragment extends Fragment
             public void onClick(View view)
             {
                 FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
-                UserDetailsFragment userDetailsFragment = new UserDetailsFragment(users, user, context);
+                UserDetailsFragment userDetailsFragment = new UserDetailsFragment(uiActivity, users, user, context);
                 fm.beginTransaction().replace(R.id.fragment_container, userDetailsFragment).commit();
             }
         });
@@ -188,13 +143,11 @@ public class PostsRecyclerFragment extends Fragment
 
     private class Adapter extends RecyclerView.Adapter<ViewHolder> // Adapter inner class
     {
-        List<PostData> data;
-        //Context context;
+        public List<PostData> data;
 
         public Adapter(List<PostData> data)
         {
             this.data = data;
-            //this.context = context;
         }
 
         @NonNull
@@ -203,9 +156,8 @@ public class PostsRecyclerFragment extends Fragment
         {
             LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
             View view = layoutInflater.inflate(R.layout.each_post_view, parent, false);
-            ViewHolder postViewHolder = new ViewHolder(view);
 
-            return postViewHolder;
+            return new ViewHolder(view);
         }
 
         @Override

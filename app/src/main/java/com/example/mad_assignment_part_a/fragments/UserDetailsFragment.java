@@ -1,23 +1,37 @@
 package com.example.mad_assignment_part_a.fragments;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.mad_assignment_part_a.LoadPostsTaskHandler;
 import com.example.mad_assignment_part_a.R;
 import com.example.mad_assignment_part_a.data.PostData;
 import com.example.mad_assignment_part_a.data.UserData;
+import com.example.mad_assignment_part_a.view_models.PostsViewModel;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,6 +40,7 @@ import java.util.List;
  */
 public class UserDetailsFragment extends Fragment
 {
+    private Activity uiActivity;
     private List<UserData> users;
     private UserData user;
     private Context context;
@@ -44,8 +59,9 @@ public class UserDetailsFragment extends Fragment
         // Required empty public constructor
     }
 
-    public UserDetailsFragment(List<UserData> users, UserData user, Context context)
+    public UserDetailsFragment(Activity uiActivity, List<UserData> users, UserData user, Context context)
     {
+        this.uiActivity = uiActivity;
         this.users = users;
         this.user = user;
         this.context = context;
@@ -81,6 +97,7 @@ public class UserDetailsFragment extends Fragment
         }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -102,6 +119,7 @@ public class UserDetailsFragment extends Fragment
         TextView bsTextView = (TextView) view.findViewById(R.id.bsTextView);
         Button viewPostButton = (Button) view.findViewById(R.id.viewPostsButton);
         Button backButton = (Button) view.findViewById(R.id.backButton);
+        ProgressBar progressBar = (ProgressBar) requireActivity().findViewById(R.id.progressBar);
 
         nameTextView.setText("Name: " + user.getName());
         usernameTextView.setText("Username: " + user.getUsername());
@@ -122,9 +140,43 @@ public class UserDetailsFragment extends Fragment
             @Override
             public void onClick(View view)
             {
-                FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
-                PostsRecyclerFragment recyclerFragment = new PostsRecyclerFragment(users, user, context);
-                fm.beginTransaction().replace(R.id.fragment_container, recyclerFragment).commit();
+
+                // Loading posts
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                PostsViewModel postsViewModel = new ViewModelProvider(requireActivity(), (ViewModelProvider.Factory) new ViewModelProvider.NewInstanceFactory()).get(PostsViewModel.class);
+                LoadPostsTaskHandler loadPostsTaskHandler = new LoadPostsTaskHandler(uiActivity, postsViewModel, progressBar);
+                executorService.execute(loadPostsTaskHandler);
+
+                postsViewModel.postsData.observe(getViewLifecycleOwner(), new Observer<String>()
+                {
+                    @Override
+                    public void onChanged(String s)
+                    {
+                        try
+                        {
+                            // Parsing posts into list
+                            String postsData = postsViewModel.getPostsData();
+                            JSONArray jList = new JSONArray(postsData);
+                            List<PostData> posts = new ArrayList<>();
+
+                            for(int i = 0; i < jList.length(); i++)
+                            {
+                                JSONObject jObject = jList.getJSONObject(i);
+                                PostData post = new PostData(jObject.getInt("userId"), jObject.getInt("id"), jObject.getString("title"), jObject.getString("body"));
+                                posts.add(post);
+                            }
+
+                            // Creating posts fragment
+                            FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
+                            PostsRecyclerFragment recyclerFragment = new PostsRecyclerFragment(uiActivity, users, posts, user, context);
+                            fm.beginTransaction().replace(R.id.fragment_container, recyclerFragment).commit();
+                        }
+                        catch(JSONException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         });
 
@@ -133,8 +185,9 @@ public class UserDetailsFragment extends Fragment
             @Override
             public void onClick(View view)
             {
+                // Going back to list of users fragment
                 FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
-                UsersRecyclerFragment recyclerFragment = new UsersRecyclerFragment(users);
+                UsersRecyclerFragment recyclerFragment = new UsersRecyclerFragment(uiActivity, users);
                 fm.beginTransaction().replace(R.id.fragment_container, recyclerFragment).commit();
             }
         });

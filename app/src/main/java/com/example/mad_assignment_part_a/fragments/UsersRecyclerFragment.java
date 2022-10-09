@@ -1,7 +1,12 @@
 package com.example.mad_assignment_part_a.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,15 +15,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.example.mad_assignment_part_a.MainActivity;
 import com.example.mad_assignment_part_a.R;
-import com.example.mad_assignment_part_a.data.PostData;
 import com.example.mad_assignment_part_a.data.UserData;
 
 import java.util.List;
@@ -30,6 +27,7 @@ import java.util.List;
  */
 public class UsersRecyclerFragment extends Fragment
 {
+    private Activity uiActivity;
     private List<UserData> users;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -46,8 +44,9 @@ public class UsersRecyclerFragment extends Fragment
         // Required empty public constructor
     }
 
-    public UsersRecyclerFragment(List<UserData> users)
+    public UsersRecyclerFragment(Activity uiActivity, List<UserData> users)
     {
+        this.uiActivity = uiActivity;
         this.users = users;
     }
 
@@ -91,7 +90,7 @@ public class UsersRecyclerFragment extends Fragment
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         Adapter adapter = new Adapter(users, getContext());
         rv.setAdapter(adapter);
-        Toast.makeText(getContext(), "TESTING", Toast.LENGTH_LONG).show();
+
         return view;
     }
 
@@ -123,9 +122,8 @@ public class UsersRecyclerFragment extends Fragment
         {
             LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
             View view = layoutInflater.inflate(R.layout.each_username_view, parent, false);
-            ViewHolder userViewHolder = new ViewHolder(view);
 
-            return userViewHolder;
+            return new ViewHolder(view);
         }
 
         @Override
@@ -139,9 +137,9 @@ public class UsersRecyclerFragment extends Fragment
                 @Override
                 public void onClick(View view)
                 {
-                    // Fragment
+                    // Creating user details fragment
                     FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
-                    UserDetailsFragment userDetailsFragment = new UserDetailsFragment(data, user, context);
+                    UserDetailsFragment userDetailsFragment = new UserDetailsFragment(uiActivity, data, user, context);
                     fm.beginTransaction().replace(R.id.fragment_container, userDetailsFragment).commit();
                 }
             });
